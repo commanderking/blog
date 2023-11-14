@@ -1,12 +1,11 @@
 const projectsData = [
-  // {
-  //   title: 'A Search Engine',
-  //   description: `What if you could look up any information in the world? Webpages, images, videos
-  //   and more. Google has many features to help you find exactly what you're looking
-  //   for.`,
-  //   imgSrc: '/static/images/google.png',
-  //   href: 'https://www.google.com',
-  // },
+  {
+    title: 'Ranked Voting - Visualizing the 2023 Cambridge City Council Election',
+    description: `Using the 2023 Cambridge election to build an understanding of how ranked voting works.`,
+    imgSrc: '/static/images/cambridge_map_1854.jpeg',
+    imageRef: 'https://collections.leventhalmap.org/search/commonwealth:1257bc83d',
+    href: 'https://www.google.com',
+  },
   // {
   //   title: 'The Time Machine',
   //   description: `Imagine being able to travel back in time or to the future. Simple turn the knob
