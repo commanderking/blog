@@ -86,8 +86,8 @@ const CambridgeElectionPage = () => {
               return 'green'
             }
 
-            if (status === 'DEFATED') {
-              return 'gray'
+            if (status === 'DEFEATED') {
+              return 'lightgray'
             }
           }
 
@@ -119,7 +119,7 @@ const CambridgeElectionPage = () => {
                 height={roundDimensions.height}
                 fill={getFillColor(roundDimensions.status)}
                 y={roundDimensions.y}
-                x={marginLeft}
+                x={dms.marginLeft}
               />
               {roundDimensions.voteChangeText && (
                 <motion.text
