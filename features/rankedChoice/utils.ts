@@ -1,10 +1,13 @@
-import { CandidateVotesPerRound } from 'features/rankedVoting/cambridgeCityCouncil2023'
+import { CandidateVotes } from 'features/rankedChoice/cambridgeCityCouncil2023'
+import { ChartDimensions } from 'utils/useChartDimensions'
 
-type DimensionParams = {
-  votesPerRound: CandidateVotesPerRound[]
+type DimensionParams = ChartDimensions & {
+  candidates: CandidateVotes[]
   domain: [number, number]
   boundedWidth: number
+  boundedHeight: number
   totalRounds: number
+  topVoteCount: number
   quota: number
 }
 
@@ -25,8 +28,10 @@ export const getChartDimensionsForCandidates = ({
   boundedWidth,
   boundedHeight,
   totalRounds,
-  quota,
   topVoteCount,
+  quota,
+
+  // dimensions
   marginLeft,
   marginTop,
 }: DimensionParams) => {
@@ -36,7 +41,7 @@ export const getChartDimensionsForCandidates = ({
   const barWidthPerRound = candidates.map((round, candidateIndex) => {
     let votes: number[] = []
 
-    for (let i = 1; i < totalRounds; i++) {
+    for (let i = 1; i <= totalRounds; i++) {
       votes = [...votes, round[`round${i}`]]
     }
 
@@ -45,8 +50,8 @@ export const getChartDimensionsForCandidates = ({
     const interBarSpacing = 1
 
     const barHeight = (boundedHeight - candidatesCount) / candidatesCount
-    const barWidths = votes.map((vote, index) => {
-      const changeInVotes = index === 0 ? 0 : vote - votes[index - 1]
+    const barWidths = votes.map((votesInRound, index) => {
+      const changeInVotes = index === 0 ? 0 : votesInRound - votes[index - 1]
 
       const getVoteChangeText = (changeInVotes) => {
         if (changeInVotes === 0) {
@@ -55,7 +60,19 @@ export const getChartDimensionsForCandidates = ({
         const text = changeInVotes > 0 ? `+${changeInVotes}` : changeInVotes
         return text
       }
-      const width = vote * widthPerVote
+
+      const getStatus = (votesInRound, quota) => {
+        if (votesInRound === 0) {
+          return 'DEFEATED' as const
+        }
+
+        if (votesInRound >= quota) {
+          return 'ELECTED' as const
+        }
+
+        return 'CONTINUING'
+      }
+      const width = votesInRound * widthPerVote
       return {
         width,
         height: barHeight - interBarSpacing,
@@ -63,15 +80,17 @@ export const getChartDimensionsForCandidates = ({
         y: marginTop + candidateIndex * barHeight + interBarSpacing,
         voteChangeText: {
           text: getVoteChangeText(changeInVotes),
+          changeInVotes,
           x: marginLeft + width + 5,
           y: marginTop + candidateIndex * barHeight + interBarSpacing + textHeight / 2,
         },
+        votes: votesInRound,
+        status: getStatus(votesInRound, quota),
       }
     })
 
     return {
-      name: round.candidate,
-      votes: votes,
+      name: round.lastName,
       chartDimensions: barWidths,
     }
   })

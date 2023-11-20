@@ -4,16 +4,20 @@ import { useMemo, useState } from 'react'
 import { scaleLinear } from 'd3'
 import { useChartDimensions } from 'utils/useChartDimensions'
 import Axis from 'components/Axis'
-import candidates from 'features/rankedVoting/cambridgeCityCouncil2023'
+import candidates from 'features/rankedChoice/cambridgeCityCouncil2023'
 import {
   getChartDimensionsForCandidates,
   getTreshholdLineDimensions,
-} from 'features/rankedVoting/utils'
+} from 'features/rankedChoice/utils'
+import { motion } from 'framer-motion'
 
-const marginLeft = 150
+const marginLeft = 100
 const marginRight = 25
 
-const topVoteCount = 3031
+// TODO: Calculate topVoteCount and quota based on data
+const topVoteCount = 3353
+const quota = 2334
+
 const CambridgeElectionPage = () => {
   const chartSettings = {
     marginLeft,
@@ -21,8 +25,8 @@ const CambridgeElectionPage = () => {
     height: 600,
   }
 
-  const [round, setRound] = useState(0)
-  const [ref, dms] = useChartDimensions(chartSettings)
+  const [round, setRound] = useState(1)
+  const { ref, dms } = useChartDimensions(chartSettings)
 
   const xScale = useMemo(
     () => scaleLinear().domain([0, topVoteCount]).range([0, dms.boundedWidth]),
@@ -30,25 +34,24 @@ const CambridgeElectionPage = () => {
   )
 
   const treshholdLineDimensions = useMemo(
-    () => getTreshholdLineDimensions({ quota: 2118, dimensions: dms, topVoteCount }),
+    () => getTreshholdLineDimensions({ quota, dimensions: dms, topVoteCount }),
     [dms]
   )
 
   const candidateDimensions = getChartDimensionsForCandidates({
     candidates,
     ...dms,
-    boundedWidth: dms.boundedWidth,
-    boundedHeight: dms.boundedHeight,
     totalRounds: 17,
     topVoteCount,
-    quota: 3118,
+    quota,
   })
 
   return (
     <div className="Chart__wrapper" ref={ref} style={{ height: `${dms.height}px` }}>
+      <p>Round {round}</p>
       <button
         onClick={() => {
-          if (round !== 0) {
+          if (round !== 1) {
             setRound(round - 1)
           }
         }}
@@ -57,7 +60,7 @@ const CambridgeElectionPage = () => {
       </button>
       <button
         onClick={() => {
-          if (round + 1 <= 16) {
+          if (round + 1 <= 17) {
             setRound(round + 1)
           }
         }}
@@ -71,28 +74,65 @@ const CambridgeElectionPage = () => {
             <Axis domain={xScale.domain()} range={xScale.range()} pixelsPerTick={50} />
           </g>
         </g>
-        {candidateDimensions.map((candidate, index) => {
+        {candidateDimensions.map((candidate) => {
           const { chartDimensions } = candidate
+          const roundDimensions = chartDimensions[round - 1]
 
-          const roundDimensions = chartDimensions[round]
+          const getFillColor = (status) => {
+            if (status === 'CONTINUING') {
+              return 'black'
+            }
+            if (status === 'ELECTED') {
+              return 'green'
+            }
 
-          console.log({ roundDimensions })
+            if (status === 'DEFATED') {
+              return 'gray'
+            }
+          }
+
+          const getDelay = (changeInVotes: number) => {
+            if (changeInVotes < 0) {
+              return 0
+            }
+
+            return 0.5
+          }
+
           return (
-            <g>
-              <text x={0} y={dms.marginTop + roundDimensions.y} width={20}>
+            <g key={candidate.name}>
+              <text
+                x={0}
+                y={dms.marginTop + roundDimensions.y}
+                width={20}
+                fill={getFillColor(roundDimensions.status)}
+              >
                 {candidate.name}
               </text>
-              <rect
-                width={roundDimensions.width}
+              <motion.rect
+                animate={{ width: roundDimensions.width }}
+                transition={{
+                  ease: 'easeOut',
+                  duration: 0.5,
+                  delay: getDelay(roundDimensions.voteChangeText.changeInVotes),
+                }}
                 height={roundDimensions.height}
-                fill="black"
+                fill={getFillColor(roundDimensions.status)}
                 y={roundDimensions.y}
                 x={marginLeft}
               />
               {roundDimensions.voteChangeText && (
-                <text x={roundDimensions.voteChangeText.x} y={roundDimensions.voteChangeText.y}>
+                <motion.text
+                  initial={{ opacity: 0 }}
+                  animate={{ x: roundDimensions.voteChangeText.x, opacity: 1 }}
+                  transition={{
+                    duration: 0.5,
+                    delay: getDelay(roundDimensions.voteChangeText.changeInVotes),
+                  }}
+                  y={roundDimensions.voteChangeText.y}
+                >
                   {roundDimensions.voteChangeText.text}
-                </text>
+                </motion.text>
               )}
             </g>
           )
@@ -107,6 +147,9 @@ const CambridgeElectionPage = () => {
       </svg>
 
       <div>
+        <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1 }}>
+          What is going on?
+        </motion.span>
         <h3>Resources</h3>
         https://2019.wattenberger.com/blog/react-and-d3
       </div>

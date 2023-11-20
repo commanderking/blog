@@ -4,7 +4,7 @@ const projectsData = [
     description: `Using the 2023 Cambridge election to build an understanding of how ranked voting works.`,
     imgSrc: '/static/images/cambridge_map_1854.jpeg',
     imageRef: 'https://collections.leventhalmap.org/search/commonwealth:1257bc83d',
-    href: 'https://www.google.com',
+    href: 'projects/ranked-choice/cambridge-city-council-2023',
   },
   // {
   //   title: 'The Time Machine',
