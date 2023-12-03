@@ -548,7 +548,8 @@ const data = [
 ] as const
 
 export type CandidateVotes = {
-  candidate: string
+  lastName: string
+  firstName: string
   round1: number
   round2: number
   round3: number

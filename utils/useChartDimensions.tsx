@@ -19,7 +19,7 @@ const combineChartDimensions = (dimensions: ChartDimensionInput) => {
     marginTop: dimensions.marginTop || 10,
     marginRight: dimensions.marginRight || 10,
     marginBottom: dimensions.marginBottom || 40,
-    marginLeft: dimensions.marginLeft || 75,
+    marginLeft: dimensions.marginLeft || 0,
   }
 
   const { height, width } = dimensions

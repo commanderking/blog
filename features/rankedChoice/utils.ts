@@ -1,4 +1,4 @@
-import { CandidateVotes } from 'features/rankedChoice/cambridgeCityCouncil2023'
+import { CandidateVotes } from 'features/rankedChoice/cambridgeCityCouncil2023Data'
 import { ChartDimensions } from 'utils/useChartDimensions'
 
 type DimensionParams = ChartDimensions & {
@@ -23,6 +23,76 @@ export const getTreshholdLineDimensions = ({ quota, topVoteCount, dimensions }) 
   }
 }
 
+const getVoteChangeText = (changeInVotes) => {
+  if (changeInVotes === 0) {
+    return null
+  }
+  const text = changeInVotes > 0 ? `+${changeInVotes}` : changeInVotes
+  return text
+}
+
+const getFillColor = (status: 'CONTINUING' | 'ELECTED' | 'DEFEATED') => {
+  if (status === 'CONTINUING') {
+    return 'black'
+  }
+  if (status === 'ELECTED') {
+    return 'green'
+  }
+
+  if (status === 'DEFEATED') {
+    return 'lightgray'
+  }
+}
+
+const getStatus = (votesInRound, quota) => {
+  if (votesInRound === 0) {
+    return 'DEFEATED' as const
+  }
+
+  if (votesInRound >= quota) {
+    return 'ELECTED' as const
+  }
+
+  return 'CONTINUING'
+}
+
+const byCandidates = (candidateA, candidateB) => {
+  if (candidateA.name === 'Exhausted') {
+    return 1
+  }
+
+  if (candidateB.name === 'Exhausted') {
+    return -1
+  }
+
+  return candidateB.votes - candidateA.votes
+}
+
+const formatName = (lastName: string) => {
+  if (lastName.length > 12) {
+    return `${lastName.slice(0, 9)}...`
+  }
+  return lastName
+}
+
+export const getQuotaAndTotalVotes = (candidates, availablePositions) => {
+  const totalVotes = candidates.reduce((votes, candidate) => {
+    return votes + candidate.round1
+  }, 0)
+
+  const topVoteCount = candidates.reduce((votes, candidate) => {
+    return candidate.round1 >= votes ? candidate.round1 : votes
+  }, 0)
+
+  const quota = Math.ceil(totalVotes / (availablePositions + 1))
+
+  return {
+    totalVotes,
+    topVoteCount,
+    quota,
+  }
+}
+
 export const getChartDimensionsForCandidates = ({
   candidates,
   boundedWidth,
@@ -38,62 +108,57 @@ export const getChartDimensionsForCandidates = ({
   const candidatesCount = candidates.length
   const textHeight = 20
 
-  const barWidthPerRound = candidates.map((round, candidateIndex) => {
-    let votes: number[] = []
+  let rounds = []
 
-    for (let i = 1; i <= totalRounds; i++) {
-      votes = [...votes, round[`round${i}`]]
-    }
+  const widthPerVote = boundedWidth / topVoteCount
 
-    const widthPerVote = boundedWidth / topVoteCount
+  const interBarSpacing = 1
 
-    const interBarSpacing = 1
+  const barHeight = (boundedHeight - candidatesCount) / candidatesCount
 
-    const barHeight = (boundedHeight - candidatesCount) / candidatesCount
-    const barWidths = votes.map((votesInRound, index) => {
-      const changeInVotes = index === 0 ? 0 : votesInRound - votes[index - 1]
+  for (let round = 1; round <= totalRounds; round++) {
+    const votesAndCandidate = candidates.map((candidate) => {
+      const { lastName, firstName } = candidate
+      const votes = candidate[`round${round}`]
+      const changeInVotes = round === 1 ? 0 : votes - candidate[`round${round - 1}`]
+      const width = votes * widthPerVote
 
-      const getVoteChangeText = (changeInVotes) => {
-        if (changeInVotes === 0) {
-          return null
-        }
-        const text = changeInVotes > 0 ? `+${changeInVotes}` : changeInVotes
-        return text
-      }
+      const status = getStatus(votes, quota)
 
-      const getStatus = (votesInRound, quota) => {
-        if (votesInRound === 0) {
-          return 'DEFEATED' as const
-        }
-
-        if (votesInRound >= quota) {
-          return 'ELECTED' as const
-        }
-
-        return 'CONTINUING'
-      }
-      const width = votesInRound * widthPerVote
       return {
-        width,
+        name: formatName(candidate.lastName),
+        key: `${lastName}-${firstName}`,
+
+        votes,
+        width: votes * widthPerVote,
         height: barHeight - interBarSpacing,
-        x: marginLeft,
-        y: marginTop + candidateIndex * barHeight + interBarSpacing,
         voteChangeText: {
           text: getVoteChangeText(changeInVotes),
           changeInVotes,
           x: marginLeft + width + 5,
-          y: marginTop + candidateIndex * barHeight + interBarSpacing + textHeight / 2,
         },
-        votes: votesInRound,
-        status: getStatus(votesInRound, quota),
+        status,
+        fillColor: getFillColor(status),
+      }
+    })
+    rounds.push(votesAndCandidate)
+  }
+
+  const sortedRounds = rounds.map((candidates) => {
+    const sorted = candidates.sort(byCandidates).map((candidate, index) => {
+      const barY = index * barHeight + interBarSpacing
+      return {
+        ...candidate,
+        y: barY,
+        voteChangeText: {
+          height: barHeight - interBarSpacing,
+          ...candidate.voteChangeText,
+        },
       }
     })
 
-    return {
-      name: round.lastName,
-      chartDimensions: barWidths,
-    }
+    return sorted
   })
 
-  return barWidthPerRound
+  return sortedRounds
 }
