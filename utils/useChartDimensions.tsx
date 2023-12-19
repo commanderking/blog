@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect, MutableRefObject } from 'react'
+import { useRef, useState, useEffect } from 'react'
 
 export type ChartDimensions = {
   marginTop: number
@@ -19,12 +19,11 @@ const combineChartDimensions = (dimensions: ChartDimensionInput) => {
     marginTop: dimensions.marginTop || 10,
     marginRight: dimensions.marginRight || 10,
     marginBottom: dimensions.marginBottom || 40,
-    marginLeft: dimensions.marginLeft || 75,
+    marginLeft: dimensions.marginLeft || 0,
   }
 
   const { height, width } = dimensions
 
-  console.log({ dimensions })
   return {
     ...parsedDimensions,
     boundedHeight: height ? height - parsedDimensions.marginTop - parsedDimensions.marginBottom : 0,
@@ -40,7 +39,6 @@ export const useChartDimensions = (passedSettings: ChartDimensionInput) => {
   const [height, setHeight] = useState(0)
 
   useEffect(() => {
-    console.log({ passedSettings })
     if (dimensions.width && dimensions.height) return [ref, dimensions]
 
     const element = ref.current
