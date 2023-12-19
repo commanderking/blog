@@ -15,7 +15,8 @@ import { motion } from 'framer-motion'
 const marginLeft = 100
 const marginRight = 25
 
-// TODO: Calculate topVoteCount and quota based on data
+// TODO: Move to being fed in from data
+const totalRounds = 9
 
 const CambridgeElectionPage = () => {
   const chartSettings = {
@@ -43,7 +44,7 @@ const CambridgeElectionPage = () => {
   const rounds = getChartDimensionsForCandidates({
     candidates,
     ...dms,
-    totalRounds: 9,
+    totalRounds,
     topVoteCount,
     quota,
   })
@@ -54,7 +55,7 @@ const CambridgeElectionPage = () => {
   return (
     <div>
       <div className="Chart__wrapper" ref={ref} style={{ height: `${dms.height}px` }}>
-        <p>Round {round}</p>
+        <p>Round {round + 1}</p>
         <button
           onClick={() => {
             if (round !== 0) {
@@ -66,7 +67,7 @@ const CambridgeElectionPage = () => {
         </button>
         <button
           onClick={() => {
-            if (round + 1 <= 16) {
+            if (round + 1 < totalRounds) {
               setRound(round + 1)
             }
           }}

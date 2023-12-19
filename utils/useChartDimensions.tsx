@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect, MutableRefObject } from 'react'
+import { useRef, useState, useEffect } from 'react'
 
 export type ChartDimensions = {
   marginTop: number
