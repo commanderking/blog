@@ -11,9 +11,6 @@ import {
   getQuotaAndTotalVotes,
 } from 'features/rankedChoice/utils'
 import { motion } from 'framer-motion'
-import Intro from 'features/rankedChoice/intro.mdx'
-import { MDXLayoutRenderer } from 'pliny/mdx-components'
-import { components } from '@/components/MDXComponents'
 
 const marginLeft = 100
 const marginRight = 25
@@ -56,7 +53,6 @@ const CambridgeElectionPage = () => {
   const getYTransition = () => ({ duration: 0.5, delay: 1 })
   return (
     <div>
-      <Intro />
       <div className="Chart__wrapper" ref={ref} style={{ height: `${dms.height}px` }}>
         <p>Round {round}</p>
         <button
@@ -161,13 +157,6 @@ const CambridgeElectionPage = () => {
         </svg>
 
         <div>
-          <motion.span
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 1 }}
-          >
-            What is going on?
-          </motion.span>
           <h3>Resources</h3>
           https://2019.wattenberger.com/blog/react-and-d3
         </div>
