@@ -24,7 +24,6 @@ const combineChartDimensions = (dimensions: ChartDimensionInput) => {
 
   const { height, width } = dimensions
 
-  console.log({ dimensions })
   return {
     ...parsedDimensions,
     boundedHeight: height ? height - parsedDimensions.marginTop - parsedDimensions.marginBottom : 0,
@@ -40,7 +39,6 @@ export const useChartDimensions = (passedSettings: ChartDimensionInput) => {
   const [height, setHeight] = useState(0)
 
   useEffect(() => {
-    console.log({ passedSettings })
     if (dimensions.width && dimensions.height) return [ref, dimensions]
 
     const element = ref.current
