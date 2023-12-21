@@ -195,4 +195,5 @@ const data = [
     round9: 3033,
   },
 ]
+
 export default data
