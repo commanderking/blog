@@ -16,6 +16,7 @@ const marginRight = 25
 
 const RankedChoiceContainer = ({
   candidates,
+  roundComments,
   // TODO: Calculate total rounds based on data
   totalRounds,
   availablePositions,
@@ -52,29 +53,36 @@ const RankedChoiceContainer = ({
 
   const candidatesInRound = rounds[round]
 
+  console.log({ roundComments })
+
+  const commentsInRound = roundComments[round].text
+
   const getYTransition = () => ({ duration: 0.5, delay: 1 })
   return (
     <div>
-      <div className="Chart__wrapper" ref={ref} style={{ height: `${dms.height}px` }}>
-        <p>Round {round + 1}</p>
-        <button
-          onClick={() => {
-            if (round !== 0) {
-              setRound(round - 1)
-            }
-          }}
-        >
-          Previous
-        </button>
-        <button
-          onClick={() => {
-            if (round + 1 < totalRounds) {
-              setRound(round + 1)
-            }
-          }}
-        >
-          Next
-        </button>
+      <div className="bg-slate-100 p-8" ref={ref}>
+        <div className="m-8 ml-16 mr-16">
+          <p className="text-xl">Round {round + 1}</p>
+          {commentsInRound}
+          <button
+            onClick={() => {
+              if (round !== 0) {
+                setRound(round - 1)
+              }
+            }}
+          >
+            Previous
+          </button>
+          <button
+            onClick={() => {
+              if (round + 1 < totalRounds) {
+                setRound(round + 1)
+              }
+            }}
+          >
+            Next
+          </button>
+        </div>
         <svg width={dms.width} height={dms.height}>
           <g transform={`translate(${[dms.marginLeft, dms.marginTop].join(',')})`}>
             <rect width={dms.boundedWidth} height={dms.boundedHeight} fill="lavender" />
