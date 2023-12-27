@@ -16,6 +16,7 @@ const marginRight = 25
 
 const RankedChoiceContainer = ({
   candidates,
+  roundComments,
   // TODO: Calculate total rounds based on data
   totalRounds,
   availablePositions,
@@ -51,30 +52,53 @@ const RankedChoiceContainer = ({
   })
 
   const candidatesInRound = rounds[round]
+  const commentsInRound = roundComments[round].text
 
   const getYTransition = () => ({ duration: 0.5, delay: 1 })
   return (
-    <div>
-      <div className="Chart__wrapper" ref={ref} style={{ height: `${dms.height}px` }}>
-        <p>Round {round + 1}</p>
-        <button
-          onClick={() => {
-            if (round !== 0) {
-              setRound(round - 1)
-            }
-          }}
-        >
-          Previous
-        </button>
-        <button
-          onClick={() => {
-            if (round + 1 < totalRounds) {
-              setRound(round + 1)
-            }
-          }}
-        >
-          Next
-        </button>
+    <div className="bg-gray-100 p-4">
+      <div className="p-4 text-center">
+        <div className="inline-flex">
+          <button
+            onClick={() => {
+              if (round !== 0) {
+                setRound(round - 1)
+              }
+            }}
+            className="rounded-l bg-gray-300 px-2 py-2 font-bold text-gray-800 hover:bg-gray-400"
+          >
+            Prev
+          </button>
+          {roundComments.map((comment) => {
+            const className =
+              comment.round - 1 === round
+                ? 'rounded-l bg-green-300 px-2 py-2 font-bold text-gray-800 hover:bg-green-400'
+                : 'rounded-l bg-gray-300 px-2 py-2 font-bold text-gray-800 hover:bg-gray-400'
+
+            return (
+              <button className={className} onClick={() => setRound(comment.round - 1)}>
+                {comment.round}
+              </button>
+            )
+          })}
+          <button
+            onClick={() => {
+              if (round + 1 < totalRounds) {
+                setRound(round + 1)
+              }
+            }}
+            className="rounded-r bg-gray-300 px-2 py-2 font-bold text-gray-800 hover:bg-gray-400"
+          >
+            Next
+          </button>
+        </div>
+      </div>
+      <div className="pl-16 pr-16">
+        <p className="text-center text-xl">Count {round + 1}</p>
+        <div>{commentsInRound}</div>
+      </div>
+
+      <div className="p-4" ref={ref}>
         <svg width={dms.width} height={dms.height}>
           <g transform={`translate(${[dms.marginLeft, dms.marginTop].join(',')})`}>
             <rect width={dms.boundedWidth} height={dms.boundedHeight} fill="lavender" />
