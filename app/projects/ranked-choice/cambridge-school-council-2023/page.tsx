@@ -8,17 +8,8 @@ const roundComments = [
       <div>
         <p>
           In the first round, both Rachel Weinstein and Elizabeth Clark Polner Hudson were elected
-          for surpassing the quota. If this were single choice voting, the following candidates
-          would have been elected:
+          for surpassing the quota of 3037 votes.{' '}
         </p>
-        <ul className="ml-8 list-decimal">
-          <li>Rachel Weinstein</li>
-          <li>Elizabeth Clark Polner Hudson</li>
-          <li>Caroline Hunter</li>
-          <li>King</li>
-          <li>Weinstein</li>
-          <li>Luis Rojas Villa</li>
-        </ul>
       </div>
     ),
   },
@@ -27,12 +18,12 @@ const roundComments = [
     text: (
       <div>
         <p>
-          {' '}
-          In round 1, Rachel Weinstein received the most votes, surpassing the quota by 614 votes.
-          In Cambridge's quota system, every vote over the quota needs to be redistributed to the
-          other candidates if possible. In this case, of the original 3651 votes she received, 614
-          of the 3651 ballots will be selected through the Droop system to redistribute to other
-          candidates.{' '}
+          Having surpassed the quota by 614 votes, this number must be transferred to the other
+          candidates. To determine which of the 3651 ballots to select, Cambridge employs the{' '}
+          <a href="https://www.opavote.com/methods/cambridge-stv-rules">Cincinnati method</a>, where
+          ballots are numbered and every "n" ballots are selected. N is determined based on the
+          total ballots and surplus ballots. More than 1/3 of these ballots went to David Weinstein
+          (no relation).
         </p>
       </div>
     ),
@@ -42,8 +33,8 @@ const roundComments = [
     text: (
       <div>
         <p>
-          Clark Poiner also exceed the quota by 479 votes. Her votes are redistributed to the
-          remaining candidates.
+          Hudson also exceeded the quota by 479 votes. Her votes are transferred to the remaining
+          candidates.
         </p>
       </div>
     ),
@@ -128,12 +119,12 @@ const CambridgeElectionPage = () => {
           While in most cases single and ranked choice voting produce the same results, the 2023
           Cambridge school council elections did not. In this year's election,
         </p>
-        <ul className="list-disc pl-8">
+        <ul className="mt-4 list-disc pl-8">
           <li>11 candidates vied for 6 council positions. 3 write-in candidates received votes.</li>
           <li>23,092 total ballots were submitted</li>
           <li>21,255 were valid. </li>
           <li>
-            3037 votes were required to become elected . Any votes over 3037 would be reallocated to
+            3037 votes were required to become elected . Any votes over 3037 are allocated to
             remaining candidates. (See{' '}
             {
               <a target="_blank" href="https://en.wikipedia.org/wiki/Droop_quota">
@@ -142,6 +133,17 @@ const CambridgeElectionPage = () => {
             }
             )
           </li>
+        </ul>
+        <p className="mt-4">
+          If this were single choice voting, the following candidates would have been elected:
+        </p>
+        <ul className="ml-8 mt-4 list-decimal">
+          <li>Rachel Weinstein</li>
+          <li>Elizabeth Hudson</li>
+          <li>Caroline Hunter</li>
+          <li>Andrew King</li>
+          <li>David Weinstein</li>
+          <li>Luis Rojas Villareal</li>
         </ul>
       </div>
 
