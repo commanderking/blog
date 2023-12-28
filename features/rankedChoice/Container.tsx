@@ -55,6 +55,7 @@ const RankedChoiceContainer = ({
   const commentsInRound = roundComments[round].text
 
   const getYTransition = () => ({ duration: 0.5, delay: 1 })
+
   return (
     <div className="bg-gray-100 p-4">
       <div className="p-4 text-center">
@@ -137,16 +138,27 @@ const RankedChoiceContainer = ({
                   {candidate.name}
                 </motion.text>
                 <motion.rect
-                  animate={{ width: candidate.width }}
+                  animate={{ width: candidate.width, fill: candidate.fillColor }}
                   transition={{
                     ease: 'easeOut',
                     duration: 0.5,
                     delay: getDelay(candidate.voteChangeText.changeInVotes),
+                    fill: { delay: getDelay(candidate.voteChangeText.changeInVotes) + 0.5 },
                   }}
                   height={candidate.height}
                   fill={candidate.fillColor}
                   x={dms.marginLeft}
                 />
+                <motion.rect
+                  // Having key here is critical to re-render every round and reset width to 0
+                  key={round}
+                  initial={{ width: 0, fill: 'black' }}
+                  animate={candidate.voteChange.animate}
+                  transition={candidate.voteChange.transition}
+                  x={candidate.voteChange.x}
+                  height={candidate.height}
+                />
+
                 {candidate.votes && (
                   <text x={dms.marginLeft + 5} y={textHeight / 2} fill="white">
                     {candidate.votes}
@@ -157,15 +169,9 @@ const RankedChoiceContainer = ({
                   <motion.text
                     dominantBaseline="middle"
                     y={textCenterY}
-                    animate={{
-                      x: candidate.voteChangeText.x,
-                      opacity: 1,
-                    }}
-                    transition={{
-                      duration: 0.5,
-                      delay: 0.5,
-                    }}
-                    fill={candidate.fillColor}
+                    animate={candidate.voteChangeText.animate}
+                    transition={candidate.voteChangeText.transition}
+                    fill={candidate.voteChangeText.fillColor}
                   >
                     {candidate.voteChangeText.text}
                   </motion.text>

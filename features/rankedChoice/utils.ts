@@ -49,7 +49,7 @@ const getStatus = (votesInRound, quota) => {
     return 'DEFEATED' as const
   }
 
-  if (votesInRound >= quota) {
+  if (votesInRound === quota) {
     return 'ELECTED' as const
   }
 
@@ -93,6 +93,28 @@ export const getQuotaAndTotalVotes = (candidates, availablePositions) => {
   }
 }
 
+const getVoteChange = (changeInVotes: number, widthPerVote: number) => {
+  return {
+    votes: changeInVotes,
+    width: Math.abs(changeInVotes * widthPerVote),
+    x:
+      changeInVotes > 0 || status === 'ELECTED'
+        ? votes * widthPerVote - changeInVotes * widthPerVote
+        : 0,
+    fillColor: changeInVotes > 0 ? 'green' : 'gray',
+  }
+}
+
+const barTransition = 0.5
+
+const getDelay = (changeInVotes: number) => {
+  if (changeInVotes < 0) {
+    return 0
+  }
+
+  return barTransition
+}
+
 export const getChartDimensionsForCandidates = ({
   candidates,
   boundedWidth,
@@ -103,10 +125,8 @@ export const getChartDimensionsForCandidates = ({
 
   // dimensions
   marginLeft,
-  marginTop,
 }: DimensionParams) => {
   const candidatesCount = candidates.length
-  const textHeight = 20
 
   let rounds = []
 
@@ -120,7 +140,8 @@ export const getChartDimensionsForCandidates = ({
     const votesAndCandidate = candidates.map((candidate) => {
       const { lastName, firstName } = candidate
       const votes = candidate[`round${round}`]
-      const changeInVotes = round === 1 ? 0 : votes - candidate[`round${round - 1}`]
+      const previousRoundVotes = round === 1 ? 0 : candidate[`round${round - 1}`]
+      const changeInVotes = round === 1 ? 0 : votes - previousRoundVotes
       const width = votes * widthPerVote
 
       const status = getStatus(votes, quota)
@@ -130,12 +151,42 @@ export const getChartDimensionsForCandidates = ({
         key: `${lastName}-${firstName}`,
 
         votes,
-        width: votes * widthPerVote,
+        width,
         height: barHeight - interBarSpacing,
+        voteChange: {
+          votes: changeInVotes,
+          x:
+            changeInVotes > 0 || status === 'ELECTED'
+              ? marginLeft + votes * widthPerVote - changeInVotes * widthPerVote
+              : 0,
+          animate:
+            changeInVotes > 0
+              ? {
+                  width: Math.abs(changeInVotes * widthPerVote),
+                  fill: changeInVotes > 0 ? 'green' : 'gray',
+                }
+              : {},
+          transition:
+            changeInVotes > 0
+              ? {
+                  ease: 'easeOut',
+                  duration: barTransition,
+                  delay: getDelay(changeInVotes),
+                }
+              : {},
+        },
         voteChangeText: {
           text: getVoteChangeText(changeInVotes),
           changeInVotes,
-          x: marginLeft + width + 5,
+          animate: {
+            x: marginLeft + width + 5,
+            opacity: 1,
+          },
+          transition: {
+            duration: 0.5,
+            delay: 0.5,
+          },
+          fillColor: 'black',
         },
         status,
         fillColor: getFillColor(status),
