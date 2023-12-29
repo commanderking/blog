@@ -1,9 +1,9 @@
 import { CandidateVotes } from 'features/rankedChoice/cambridgeCityCouncil2023Data'
 import { ChartDimensions } from 'utils/useChartDimensions'
+import { CandidateRound } from 'features/rankedChoice/types'
 
 type DimensionParams = ChartDimensions & {
   candidates: CandidateVotes[]
-  domain: [number, number]
   boundedWidth: number
   boundedHeight: number
   totalRounds: number
@@ -42,6 +42,8 @@ const getFillColor = (status: 'CONTINUING' | 'ELECTED' | 'DEFEATED') => {
   if (status === 'DEFEATED') {
     return 'lightgray'
   }
+
+  return ''
 }
 
 const getStatus = (votesInRound, quota) => {
@@ -93,18 +95,6 @@ export const getQuotaAndTotalVotes = (candidates, availablePositions) => {
   }
 }
 
-const getVoteChange = (changeInVotes: number, widthPerVote: number) => {
-  return {
-    votes: changeInVotes,
-    width: Math.abs(changeInVotes * widthPerVote),
-    x:
-      changeInVotes > 0 || status === 'ELECTED'
-        ? votes * widthPerVote - changeInVotes * widthPerVote
-        : 0,
-    fillColor: changeInVotes > 0 ? 'green' : 'gray',
-  }
-}
-
 const barTransition = 0.5
 
 const getDelay = (changeInVotes: number) => {
@@ -128,18 +118,16 @@ export const getChartDimensionsForCandidates = ({
 }: DimensionParams) => {
   const candidatesCount = candidates.length
 
-  let rounds = []
+  let rounds: CandidateRound[][] = []
 
   const widthPerVote = boundedWidth / topVoteCount
-
   const interBarSpacing = 1
-
   const barHeight = (boundedHeight - candidatesCount) / candidatesCount
 
   for (let round = 1; round <= totalRounds; round++) {
-    const votesAndCandidate = candidates.map((candidate) => {
+    const roundResult: CandidateRound[] = candidates.map((candidate) => {
       const { lastName, firstName } = candidate
-      const votes = candidate[`round${round}`]
+      const votes: number = candidate[`round${round}`]
       const previousRoundVotes = round === 1 ? 0 : candidate[`round${round - 1}`]
       const changeInVotes = round === 1 ? 0 : votes - previousRoundVotes
       const width = votes * widthPerVote
@@ -153,6 +141,15 @@ export const getChartDimensionsForCandidates = ({
         votes,
         width,
         height: barHeight - interBarSpacing,
+        status,
+        fillColor: getFillColor(status),
+        animate: { width: width, fill: getFillColor(status) },
+        transition: {
+          ease: 'easeOut',
+          duration: 0.5,
+          delay: getDelay(changeInVotes),
+          fill: { delay: getDelay(changeInVotes) + 0.5 },
+        },
         voteChange: {
           votes: changeInVotes,
           x:
@@ -169,7 +166,6 @@ export const getChartDimensionsForCandidates = ({
           transition:
             changeInVotes > 0
               ? {
-                  ease: 'easeOut',
                   duration: barTransition,
                   delay: getDelay(changeInVotes),
                 }
@@ -177,10 +173,9 @@ export const getChartDimensionsForCandidates = ({
         },
         voteChangeText: {
           text: getVoteChangeText(changeInVotes),
-          changeInVotes,
+          votes,
           animate: {
             x: marginLeft + width + 5,
-            opacity: 1,
           },
           transition: {
             duration: 0.5,
@@ -188,12 +183,12 @@ export const getChartDimensionsForCandidates = ({
           },
           fillColor: 'black',
         },
-        status,
-        fillColor: getFillColor(status),
       }
     })
-    rounds.push(votesAndCandidate)
+    rounds.push(roundResult)
   }
+
+  console.log({ rounds })
 
   const sortedRounds = rounds.map((candidates) => {
     const sorted = candidates.sort(byCandidates).map((candidate, index) => {
