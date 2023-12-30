@@ -9,6 +9,7 @@ import {
   getTreshholdLineDimensions,
   getQuotaAndTotalVotes,
 } from 'features/rankedChoice/utils'
+// @ts-ignore
 import { motion } from 'framer-motion'
 
 const marginLeft = 100
@@ -55,6 +56,7 @@ const RankedChoiceContainer = ({
   const commentsInRound = roundComments[round].text
 
   const getYTransition = () => ({ duration: 0.5, delay: 1 })
+
   return (
     <div className="bg-gray-100 p-4">
       <div className="p-4 text-center">
@@ -72,8 +74,8 @@ const RankedChoiceContainer = ({
           {roundComments.map((comment) => {
             const className =
               comment.round - 1 === round
-                ? 'rounded-l bg-green-300 px-2 py-2 font-bold text-gray-800 hover:bg-green-400'
-                : 'rounded-l bg-gray-300 px-2 py-2 font-bold text-gray-800 hover:bg-gray-400'
+                ? 'bg-green-300 px-2 py-2 font-bold text-gray-800 hover:bg-green-400'
+                : 'bg-gray-300 px-2 py-2 font-bold text-gray-800 hover:bg-gray-400'
 
             return (
               <button className={className} onClick={() => setRound(comment.round - 1)}>
@@ -98,7 +100,11 @@ const RankedChoiceContainer = ({
         <div>{commentsInRound}</div>
       </div>
 
-      <div className="p-4" ref={ref}>
+      <div
+        className="p-4"
+        // @ts-ignore
+        ref={ref}
+      >
         <svg width={dms.width} height={dms.height}>
           <g transform={`translate(${[dms.marginLeft, dms.marginTop].join(',')})`}>
             <rect width={dms.boundedWidth} height={dms.boundedHeight} fill="lavender" />
@@ -122,7 +128,7 @@ const RankedChoiceContainer = ({
                 animate={{ y: dms.marginTop + candidate.y + 1 }}
                 transition={{
                   duration: 0.5,
-                  delay: getDelay(candidate.voteChangeText.changeInVotes),
+                  delay: getDelay(candidate.voteChangeText.votes),
                   y: getYTransition(),
                 }}
                 height={candidate.height}
@@ -137,16 +143,22 @@ const RankedChoiceContainer = ({
                   {candidate.name}
                 </motion.text>
                 <motion.rect
-                  animate={{ width: candidate.width }}
-                  transition={{
-                    ease: 'easeOut',
-                    duration: 0.5,
-                    delay: getDelay(candidate.voteChangeText.changeInVotes),
-                  }}
+                  animate={candidate.animate}
+                  transition={candidate.transition}
                   height={candidate.height}
                   fill={candidate.fillColor}
                   x={dms.marginLeft}
                 />
+                <motion.rect
+                  // Having key here is critical to re-render every round and reset width to 0
+                  key={round}
+                  initial={{ width: 0, fill: 'black' }}
+                  animate={candidate.voteChange.animate}
+                  transition={candidate.voteChange.transition}
+                  x={candidate.voteChange.x}
+                  height={candidate.height}
+                />
+
                 {candidate.votes && (
                   <text x={dms.marginLeft + 5} y={textHeight / 2} fill="white">
                     {candidate.votes}
@@ -157,15 +169,8 @@ const RankedChoiceContainer = ({
                   <motion.text
                     dominantBaseline="middle"
                     y={textCenterY}
-                    animate={{
-                      x: candidate.voteChangeText.x,
-                      opacity: 1,
-                    }}
-                    transition={{
-                      duration: 0.5,
-                      delay: 0.5,
-                    }}
-                    fill={candidate.fillColor}
+                    animate={candidate.voteChangeText.animate}
+                    transition={candidate.voteChangeText.transition}
                   >
                     {candidate.voteChangeText.text}
                   </motion.text>

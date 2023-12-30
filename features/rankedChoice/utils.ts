@@ -1,9 +1,9 @@
 import { CandidateVotes } from 'features/rankedChoice/cambridgeCityCouncil2023Data'
 import { ChartDimensions } from 'utils/useChartDimensions'
+import { CandidateRound } from 'features/rankedChoice/types'
 
 type DimensionParams = ChartDimensions & {
   candidates: CandidateVotes[]
-  domain: [number, number]
   boundedWidth: number
   boundedHeight: number
   totalRounds: number
@@ -42,6 +42,8 @@ const getFillColor = (status: 'CONTINUING' | 'ELECTED' | 'DEFEATED') => {
   if (status === 'DEFEATED') {
     return 'lightgray'
   }
+
+  return ''
 }
 
 const getStatus = (votesInRound, quota) => {
@@ -49,7 +51,7 @@ const getStatus = (votesInRound, quota) => {
     return 'DEFEATED' as const
   }
 
-  if (votesInRound >= quota) {
+  if (votesInRound === quota) {
     return 'ELECTED' as const
   }
 
@@ -93,6 +95,16 @@ export const getQuotaAndTotalVotes = (candidates, availablePositions) => {
   }
 }
 
+const barTransition = 0.5
+
+const getDelay = (changeInVotes: number) => {
+  if (changeInVotes < 0) {
+    return 0
+  }
+
+  return barTransition
+}
+
 export const getChartDimensionsForCandidates = ({
   candidates,
   boundedWidth,
@@ -103,24 +115,21 @@ export const getChartDimensionsForCandidates = ({
 
   // dimensions
   marginLeft,
-  marginTop,
 }: DimensionParams) => {
   const candidatesCount = candidates.length
-  const textHeight = 20
 
-  let rounds = []
+  let rounds: CandidateRound[][] = []
 
   const widthPerVote = boundedWidth / topVoteCount
-
   const interBarSpacing = 1
-
   const barHeight = (boundedHeight - candidatesCount) / candidatesCount
 
   for (let round = 1; round <= totalRounds; round++) {
-    const votesAndCandidate = candidates.map((candidate) => {
+    const roundResult: CandidateRound[] = candidates.map((candidate) => {
       const { lastName, firstName } = candidate
-      const votes = candidate[`round${round}`]
-      const changeInVotes = round === 1 ? 0 : votes - candidate[`round${round - 1}`]
+      const votes: number = candidate[`round${round}`]
+      const previousRoundVotes = round === 1 ? 0 : candidate[`round${round - 1}`]
+      const changeInVotes = round === 1 ? 0 : votes - previousRoundVotes
       const width = votes * widthPerVote
 
       const status = getStatus(votes, quota)
@@ -130,18 +139,53 @@ export const getChartDimensionsForCandidates = ({
         key: `${lastName}-${firstName}`,
 
         votes,
-        width: votes * widthPerVote,
+        width,
         height: barHeight - interBarSpacing,
-        voteChangeText: {
-          text: getVoteChangeText(changeInVotes),
-          changeInVotes,
-          x: marginLeft + width + 5,
-        },
         status,
         fillColor: getFillColor(status),
+        animate: { width: width, fill: getFillColor(status) },
+        transition: {
+          ease: 'easeOut',
+          duration: 0.5,
+          delay: getDelay(changeInVotes),
+          fill: { delay: getDelay(changeInVotes) + 0.5 },
+        },
+        voteChange: {
+          votes: changeInVotes,
+          x:
+            changeInVotes > 0 || status === 'ELECTED'
+              ? marginLeft + votes * widthPerVote - changeInVotes * widthPerVote
+              : 0,
+          animate:
+            changeInVotes > 0
+              ? {
+                  width: Math.abs(changeInVotes * widthPerVote),
+                  fill: changeInVotes > 0 ? 'green' : 'gray',
+                }
+              : {},
+          transition:
+            changeInVotes > 0
+              ? {
+                  duration: barTransition,
+                  delay: getDelay(changeInVotes),
+                }
+              : {},
+        },
+        voteChangeText: {
+          text: getVoteChangeText(changeInVotes),
+          votes,
+          animate: {
+            x: marginLeft + width + 5,
+          },
+          transition: {
+            duration: 0.5,
+            delay: 0.5,
+          },
+          fillColor: 'black',
+        },
       }
     })
-    rounds.push(votesAndCandidate)
+    rounds.push(roundResult)
   }
 
   const sortedRounds = rounds.map((candidates) => {

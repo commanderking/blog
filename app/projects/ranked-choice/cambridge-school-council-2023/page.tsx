@@ -6,10 +6,9 @@ const roundComments = [
     round: 1,
     text: (
       <div>
-        <p>
-          In the first round, both Rachel Weinstein and Elizabeth Clark Polner Hudson were elected
-          for surpassing the quota of 3037 votes.{' '}
-        </p>
+        <ul className="list-disc">
+          <li>First place votes tallied.</li>
+        </ul>
       </div>
     ),
   },
@@ -17,14 +16,15 @@ const roundComments = [
     round: 2,
     text: (
       <div>
-        <p>
-          Having surpassed the quota by 614 votes, this number must be transferred to the other
-          candidates. To determine which of the 3651 ballots to select, Cambridge employs the{' '}
-          <a href="https://www.opavote.com/methods/cambridge-stv-rules">Cincinnati method</a>, where
-          ballots are numbered and every "n" ballots are selected. N is determined based on the
-          total ballots and surplus ballots. More than 1/3 of these ballots went to David Weinstein
-          (no relation).
-        </p>
+        <ul className="list-disc">
+          <li>Rachel Weinstein is elected.</li>
+          <li>Her 614 surplus votes are transferred to remaining candidates.</li>
+          <li>
+            Cambridge uses the{' '}
+            <a href="https://www.opavote.com/methods/cambridge-stv-rules">Cincinnati method</a> to
+            determine which ballots to transfer.
+          </li>
+        </ul>
       </div>
     ),
   },
@@ -32,10 +32,10 @@ const roundComments = [
     round: 3,
     text: (
       <div>
-        <p>
-          Hudson also exceeded the quota by 479 votes. Her votes are transferred to the remaining
-          candidates.
-        </p>
+        <ul className="list-disc">
+          <li>Hudson is elected.</li>
+          <li>Her 479 surplus votes are transferred to remaining candidates.</li>
+        </ul>
       </div>
     ),
   },
@@ -43,12 +43,11 @@ const roundComments = [
     round: 4,
     text: (
       <div>
-        <p>
-          After reassigning the surplus ballots, all candidates who receive fewer than 50 votes are
-          eliminated, which in this selection, includes all write-in votes. Of the 46 ballots who
-          had write-ins as their first choice, 35 were exhausted. Their ballots either contained no
-          additional candidates or only candidates who already had been elected.
-        </p>
+        <ul className="list-disc">
+          <li>All candidates with fewer than 50 votes are eliminated.</li>
+          <li>Write-in 1, Write-in 2, and Write-in 3 are defeated.</li>
+          <li>46 votes are transferred to remaining candidates, but 35 of these are exhaused.</li>
+        </ul>
       </div>
     ),
   },
@@ -56,11 +55,10 @@ const roundComments = [
     round: 5,
     text: (
       <div>
-        <p>
-          After those below 50 votes are eliminated, we eliminate the candidate with the next fewest
-          votes. Bejnood has been eliminated. Of the 450 votes, the most went to Schraa Huh (105),
-          who is in 7th place after this round of reallocation.
-        </p>
+        <ul className="list-disc">
+          <li>Alborz Bejnood is defeated.</li>
+          <li>450 votes are transferred to remaining candidates.</li>
+        </ul>
       </div>
     ),
   },
@@ -68,11 +66,10 @@ const roundComments = [
     round: 6,
     text: (
       <div>
-        {' '}
-        <p>
-          In round 6, Pierre is eliminated. Of his 906 votes, 208 are exhausted. Hunter, the
-          recipient of 116 of these votes, vaults past Weinstein.
-        </p>
+        <ul className="list-disc">
+          <li>Pierre is defeated.</li>
+          <li>906 votes are transferred.</li>
+        </ul>
       </div>
     ),
   },
@@ -80,6 +77,9 @@ const roundComments = [
     round: 7,
     text: (
       <div>
+        <ul className="list-disc">
+          <li>Travers is defeated. 1033 votes are transferred. </li>
+        </ul>
         <p>
           In round 7, Travers is eliminated. King, who at round 1 was in 4th place, is now in 6th,
           holding onto the final spot with only a 2 vote lead over Harding Jr.

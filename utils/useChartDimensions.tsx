@@ -31,6 +31,7 @@ const combineChartDimensions = (dimensions: ChartDimensionInput) => {
   }
 }
 
+// Most of this was pulled from: https://2019.wattenberger.com/blog/react-and-d3
 export const useChartDimensions = (passedSettings: ChartDimensionInput) => {
   const ref = useRef()
   const dimensions = combineChartDimensions(passedSettings)
@@ -38,6 +39,7 @@ export const useChartDimensions = (passedSettings: ChartDimensionInput) => {
   const [width, setWidth] = useState(0)
   const [height, setHeight] = useState(0)
 
+  // @ts-ignore
   useEffect(() => {
     if (dimensions.width && dimensions.height) return [ref, dimensions]
 
