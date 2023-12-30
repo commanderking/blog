@@ -188,8 +188,6 @@ export const getChartDimensionsForCandidates = ({
     rounds.push(roundResult)
   }
 
-  console.log({ rounds })
-
   const sortedRounds = rounds.map((candidates) => {
     const sorted = candidates.sort(byCandidates).map((candidate, index) => {
       const barY = index * barHeight + interBarSpacing
